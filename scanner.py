@@ -16,7 +16,7 @@ def send_data(prog_list):
 #    headers = {'content-type': 'application/json'}
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
     print(data)
-    r = requests.post(url_backend, data=data, auth=(user, mdp), headers=headers)
+    r = requests.post(url_backend, data="query="+data, auth=(user, mdp), headers=headers)
     print(r.text)
     if not r.ok:
         return False
