@@ -4,7 +4,7 @@ import requests
 import json
 
 # this config var will be move with all the config of this scanner
-url_backend = "http://127.0.0.1:8000/api/uprog/submit_programs/"
+url_backend = "http://127.0.0.1/api/uprog/submit_programs/"
 user = "vigilate"
 mdp = "vigilate"
 
