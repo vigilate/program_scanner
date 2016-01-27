@@ -16,7 +16,7 @@ mdp = "vigilate"
 def send_data(prog_list):
     data = json.dumps({"programs_list" : prog_list})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
-    print(data)
+
     r = requests.post(url_backend, data="query="+data, auth=(user, mdp), headers=headers)
     print(r.text)
     if not r.ok:
@@ -62,13 +62,13 @@ def get_rpm_progs():
     return []
 
 def main():
-    progs = {"programs_list" : []}
+    progs = []
 
     if platform.system() == "Linux":
-        progs["programs_list"] += get_pacman_progs()
-        progs["programs_list"] += get_pkg_progs()
-        progs["programs_list"] += get_dpkg_progs()
-        progs["programs_list"] += get_rpm_progs()
+        progs += get_pacman_progs()
+        progs += get_pkg_progs()
+        progs += get_dpkg_progs()
+        progs += get_rpm_progs()
 
     print(send_data(progs))
 
