@@ -25,7 +25,7 @@ def send_data(prog_list):
 
 def get_pacman_progs():
     try:
-        p = subprocess.run(['pacman', '-Q'], stdout=subprocess.PIPE)
+        p = subprocess.call(['pacman', '-Q'])
     except FileNotFoundError:
         return []
     output = p.stdout.decode().split('\n')
@@ -33,7 +33,7 @@ def get_pacman_progs():
     progs = []
     for l in filter(None, output):
         progs.append({"program1_name" : l.split(' ')[0], "program_version" : l.split(' ')[1]})
-        
+
     return progs
 
 def get_pkg_progs():
@@ -42,7 +42,7 @@ def get_pkg_progs():
 
 def get_dpkg_progs():
     try:
-        p = subprocess.run(['dpkg', '-l'], stdout=subprocess.PIPE)
+        p = subprocess.call(['dpkg', '-l'])
     except FileNotFoundError:
         return []
 
