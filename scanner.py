@@ -25,10 +25,10 @@ def send_data(prog_list):
 
 def get_pacman_progs():
     try:
-        p = subprocess.call(['pacman', '-Q'])
+        p = subprocess.check_output(['pacman', '-Q'])
     except FileNotFoundError:
         return []
-    output = p.stdout.decode().split('\n')
+    output = p.decode().split('\n')
 
     progs = []
     for l in filter(None, output):
@@ -42,11 +42,11 @@ def get_pkg_progs():
 
 def get_dpkg_progs():
     try:
-        p = subprocess.call(['dpkg', '-l'])
+        p = subprocess.check_output(['dpkg', '-l'])
     except FileNotFoundError:
         return []
 
-    output = p.stdout.decode().split('\n')
+    output = p.decode().split('\n')
     while not output[0].endswith("==="):
         output.pop(0)
 
