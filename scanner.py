@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# shebang issue with freebsd: /usr/local/bin/python3 instead of /usr/bin/python3
 
 import requests
 import json
@@ -37,8 +38,18 @@ def get_pacman_progs():
     return progs
 
 def get_pkg_progs():
-    #pkg_info
-    return []
+    try:
+        p = subprocess.check_output(['pkg', 'info'])
+    except FileNotFoundError:
+        return []
+
+    output = [prog.split(' ')[0] for prog in p.decode().split('\n')]
+
+    progs = []
+    for prog in filter(None, output):
+        progs.append({"program_name" : ''.join(prog.split('-')[:-1]), "program_version" : prog.split('-')[-1]})
+    print(progs)
+    return progs
 
 def get_dpkg_progs():
     try:
@@ -74,12 +85,14 @@ def get_rpm_progs():
 def main():
     progs = []
 
+
     if platform.system() == "Linux":
         progs += get_pacman_progs()
-        progs += get_pkg_progs()
         progs += get_dpkg_progs()
         progs += get_rpm_progs()
-
+    elif "bsd" in platform.system().lower():
+        progs += get_pkg_progs()
+        
     print(send_data(progs))
 
 if __name__ == '__main__':
