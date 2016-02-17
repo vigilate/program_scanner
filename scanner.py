@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-# shebang issue with freebsd: /usr/local/bin/python3 instead of /usr/bin/python3
+#!/usr/bin/env python3
 
 import requests
 import json
