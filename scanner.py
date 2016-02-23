@@ -88,12 +88,13 @@ def get_mac_progs():
         return []
 
     output = p.decode().split('\n\n    ')[1:]
-    output = [output[off:off+1] for off in len(output) / 2]
+    output = [output[off*2:off*2+2] for off in range(int(len(output) / 2))]
     print (output[0])
     print (output[1])
     print (output[2])
     progs = []
-
+    for prog in output:
+        progs.append({"program_name" : prog[0], "program_version" : prog[1].split('Version:')[1].split('\n')[0].strip()})
     return progs
 
 def main():
