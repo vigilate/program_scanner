@@ -81,6 +81,18 @@ def get_rpm_progs():
 
     return progs
 
+def get_mac_progs():
+    try:
+        p = subprocess.check_output(['system_profiler', 'SPApplicationsDataType'])
+    except FileNotFoundError:
+        return []
+
+    output = p.decode().split('\n      ')
+    print (output)
+    progs = []
+
+    return progs
+
 def main():
     progs = []
 
@@ -91,6 +103,8 @@ def main():
         progs += get_rpm_progs()
     elif "bsd" in platform.system().lower():
         progs += get_pkg_progs()
+    elif "darwin" in platform.system().lower():
+        progs += get_mac_progs()
         
     print(send_data(progs))
 
