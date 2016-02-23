@@ -87,7 +87,8 @@ def get_mac_progs():
     except FileNotFoundError:
         return []
 
-    output = ["".join(prog) for prog in p.decode().split('\n\n    ')[1::2]]
+    output = p.decode().split('\n\n    ')[1:]
+    output = [output[off:off+1] for off in len(output) / 2]
     print (output[0])
     print (output[1])
     print (output[2])
