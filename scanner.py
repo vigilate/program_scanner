@@ -92,8 +92,8 @@ def get_mac_progs():
 
     progs = []
     for prog in filter(lambda x: "Version:" in x[1], output):
-        print(prog)
         progs.append({"program_name" : prog[0], "program_version" : prog[1].split('Version:')[1].split('\n')[0].strip()})
+
     return progs
 
 def main():
@@ -108,7 +108,8 @@ def main():
         progs += get_pkg_progs()
     elif "darwin" in platform.system().lower():
         progs += get_mac_progs()
-        
+
+    print(progs)
     print(send_data(progs))
 
 if __name__ == '__main__':
