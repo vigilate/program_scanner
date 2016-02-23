@@ -91,7 +91,7 @@ def get_mac_progs():
     output = [output[off*2:off*2+2] for off in range(int(len(output) / 2))]
 
     progs = []
-    for prog in output:
+    for prog in filter(lambda x: "Version" in X, output):
         print(prog)
         progs.append({"program_name" : prog[0], "program_version" : prog[1].split('Version:')[1].split('\n')[0].strip()})
     return progs
