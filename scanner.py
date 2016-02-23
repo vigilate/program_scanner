@@ -109,7 +109,6 @@ def main():
     elif "darwin" in platform.system().lower():
         progs += get_mac_progs()
 
-    print(progs)
     print(send_data(progs))
 
 if __name__ == '__main__':
