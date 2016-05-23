@@ -5,6 +5,10 @@ import json
 import subprocess
 import platform
 
+if "windows" in platform.system().lower():
+    import wmi
+    import winreg
+
 # this config var will be move with all the config of this scanner
 url_backend = "http://127.0.0.1/api/uprog/submit_programs/"
 user = "vigilate"
@@ -96,6 +100,52 @@ def get_mac_progs():
 
     return progs
 
+def get_windows_progs():
+    progs = []
+
+    for prog in wmi.WMI().Win32_Product():
+        prog = str(prog).split("\n")
+        progs.append({"program_name" : prog[12].split('"')[-2], "program_version" : prog[-4].split('"')[-2]})
+
+    r = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
+    key = winreg.OpenKey(r, "Software\microsoft\Windows\CurrentVersion\\Uninstall")
+    (nb_subKey, useless, useless) = winreg.QueryInfoKey(key)
+
+    already = [p["program_name"] for p in progs]
+
+    for idx in range(nb_subKey):
+        key_name = winreg.EnumKey(key, idx)
+        sub_key = winreg.OpenKey(key, key_name)
+        try :
+            (prog_name, useless) = winreg.QueryValueEx(sub_key, "DisplayName")
+            (version, useless) = winreg.QueryValueEx(sub_key, "DisplayVersion")
+        except FileNotFoundError:
+            continue
+        if prog_name not in already:
+            progs.append({"program_name" : prog_name, "program_version" : version})
+        winreg.CloseKey(sub_key)
+    winreg.CloseKey(key)
+
+    key = winreg.OpenKey(r, "Software\Wow6432Node\microsoft\Windows\CurrentVersion\\Uninstall")
+    (nb_subKey, useless, useless) = winreg.QueryInfoKey(key)
+
+    already = [p["program_name"] for p in progs]
+
+    for idx in range(nb_subKey):
+        key_name = winreg.EnumKey(key, idx)
+        sub_key = winreg.OpenKey(key, key_name)
+        try :
+            (prog_name, useless) = winreg.QueryValueEx(sub_key, "DisplayName")
+            (version, useless) = winreg.QueryValueEx(sub_key, "DisplayVersion")
+        except FileNotFoundError:
+            continue
+        if prog_name not in already:
+            progs.append({"program_name" : prog_name, "program_version" : version})
+        winreg.CloseKey(sub_key)
+    winreg.CloseKey(key)
+    r.Close()
+    return progs
+
 def main():
     progs = []
 
@@ -108,6 +158,8 @@ def main():
         progs += get_pkg_progs()
     elif "darwin" in platform.system().lower():
         progs += get_mac_progs()
+    elif "windows" in platform.system().lower():
+        progs += get_windows_progs()
 
     print(send_data(progs))
 
