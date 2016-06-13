@@ -143,7 +143,13 @@ def get_windows_progs():
             progs.append({"program_name" : prog_name, "program_version" : version})
         winreg.CloseKey(sub_key)
     winreg.CloseKey(key)
+
+    key = winreg.OpenKey(r, "Software\Microsoft\Internet Explorer");
+    if key:
+        progs.append({"program_name" : "Internet Explorer", "program_version" : winreg.QueryValueEx(key, "Version")})
+
     r.Close()
+
     return progs
 
 def main():
