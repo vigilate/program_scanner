@@ -13,12 +13,13 @@ if "windows" in platform.system().lower():
 url_backend = "http://127.0.0.1/api/uprog/submit_programs/"
 user = "vigilate"
 mdp = "vigilate"
+poste = "1"
 
 # prog_list has to be a list like that :
 # [{"program" : "program1_name", "version" : "version_prog1"},
 #  {"program" : "program2_name", "version" : "version_prog2"}, ...]
 def send_data(prog_list):
-    data = json.dumps({"programs_list" : prog_list})
+    data = json.dumps({"programs_list" : prog_list, "poste" : 1})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
     r = requests.post(url_backend, data="query="+data, auth=(user, mdp), headers=headers)
