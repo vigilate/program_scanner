@@ -22,7 +22,7 @@ def send_data(prog_list):
     data = json.dumps({"programs_list" : prog_list, "poste" : 1})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
-    r = requests.post(url_backend, data="query="+data, auth=(user, mdp), headers=headers)
+    r = requests.post(url_backend, data=data, auth=(user, mdp), headers=headers)
     
     if not r.ok:
         return False
