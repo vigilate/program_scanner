@@ -37,7 +37,7 @@ def get_pacman_progs():
 
     progs = []
     for l in filter(None, output):
-        progs.append({"program1_name" : l.split(' ')[0], "program_version" : l.split(' ')[1].split('-')[0]})
+        progs.append({"program_name" : l.split(' ')[0], "program_version" : l.split(' ')[1].split('-')[0]})
 
     return progs
 
