@@ -10,7 +10,7 @@ if "windows" in platform.system().lower():
     import winreg
 
 # this config var will be move with all the config of this scanner
-url_backend = "http://127.0.0.1/api/uprog/"
+url_backend = "https://vigilate.eax.ovh/api/v1/uprog/"
 user = "vigilate"
 mdp = "vigilate"
 poste = "1"
