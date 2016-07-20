@@ -12,7 +12,7 @@ if "windows" in platform.system().lower():
 # this config var will be move with all the config of this scanner
 url_backend = "https://DEFAULT_URL/api/v1/uprog/"
 user = "DEFAULT_USER"
-mdp = "DEFAULT_MDP"
+mdp = "DEFAULT_PWD"
 poste = "DEFAULT_STATION"
 
 def send_data(prog_list):
