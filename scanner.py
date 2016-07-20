@@ -12,14 +12,14 @@ if "windows" in platform.system().lower():
 # this config var will be move with all the config of this scanner
 url_backend = "https://DEFAULT_URL/api/v1/uprog/"
 user = "DEFAULT_USER"
-mdp = "DEFAULT_PWD"
-poste = "DEFAULT_ID"
+token = "DEFAULT_TOKEN"
+station = "DEFAULT_ID"
 
 def send_data(prog_list):
-    data = json.dumps({"programs_list" : prog_list, "poste" : poste})
+    data = json.dumps({"programs_list" : prog_list, "station" : station})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
-    r = requests.post(url_backend, data=data, auth=(user, mdp), headers=headers)
+    r = requests.post(url_backend, data=data, auth=(user, token), headers=headers)
     
     if not r.ok:
         return False
