@@ -74,14 +74,14 @@ def get_dpkg_progs():
 def get_rpm_progs():
     try:
         p = subprocess.check_output(['rpm', '-qia'])
-    except FileNotFoundError:
+    except (FileNotFoundError, CalledProcessError):
         return []
 
     output = [':'.join(prog.split('\n')[:3]).split(':')[1::2] for prog in p.decode().split('Name')]
 
     progs = []
     for prog in output[1:]:
-        progs.append({"program_name" : prog[0], "program_version" : '-'.join([p.strip() for p in prog[1:]])})
+        progs.append({"program_name" : prog[0], "program_version" : '-'.join([p.strip() for p in prog[1:-1]])})
 
     return progs
 
