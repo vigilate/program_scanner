@@ -44,7 +44,7 @@ def get_pkg_progs():
     except FileNotFoundError:
         return []
 
-    output = [prog.split(' ')[0] for prog in p.decode().split('\n')]
+    output = [prog.split(' ')[0].split('_')[0] for prog in p.decode().split('\n')]
 
     progs = []
     for prog in filter(None, output):
