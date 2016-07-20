@@ -10,13 +10,13 @@ if "windows" in platform.system().lower():
     import winreg
 
 # this config var will be move with all the config of this scanner
-url_backend = "https://vigilate.eax.ovh/api/v1/uprog/"
-user = "vigilate"
-mdp = "vigilate"
-poste = "1"
+url_backend = "https://DEFAULT_URL/api/v1/uprog/"
+user = "DEFAULT_USER"
+mdp = "DEFAULT_MDP"
+poste = "DEFAULT_STATION"
 
 def send_data(prog_list):
-    data = json.dumps({"programs_list" : prog_list, "poste" : 1})
+    data = json.dumps({"programs_list" : prog_list, "poste" : poste})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
     r = requests.post(url_backend, data=data, auth=(user, mdp), headers=headers)
