@@ -13,7 +13,7 @@ if "windows" in platform.system().lower():
 url_backend = "https://DEFAULT_URL/api/v1/uprog/"
 user = "DEFAULT_USER"
 mdp = "DEFAULT_PWD"
-poste = "DEFAULT_STATION"
+poste = "DEFAULT_ID"
 
 def send_data(prog_list):
     data = json.dumps({"programs_list" : prog_list, "poste" : poste})
