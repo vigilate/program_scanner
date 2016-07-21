@@ -10,7 +10,7 @@ if "windows" in platform.system().lower():
     import winreg
 
 # this config var will be move with all the config of this scanner
-url_backend = "https://DEFAULT_URL/api/v1/uprog/"
+url_backend = "DEFAULT_SCHEME://DEFAULT_URL/api/v1/uprog/"
 user = "DEFAULT_USER"
 token = "DEFAULT_TOKEN"
 station = "DEFAULT_ID"
