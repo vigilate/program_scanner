@@ -16,7 +16,7 @@ token = "DEFAULT_TOKEN"
 station = "DEFAULT_ID"
 
 def send_data(prog_list):
-    data = json.dumps({"programs_list" : prog_list, "station" : station})
+    data = json.dumps({"programs_list" : prog_list, "poste" : station})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
     r = requests.post(url_backend, data=data, auth=(user, token), headers=headers)
