@@ -58,9 +58,11 @@ def get_dpkg_progs():
     except FileNotFoundError:
         return []
 
-    output = p.decode().split('\n')
+    output = p.decode()
     if not "===" in output:
         return []
+
+    output = output.split('\n')
     while not output[0].endswith("==="):
         output.pop(0)
 
