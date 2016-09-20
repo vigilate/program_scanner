@@ -15,8 +15,20 @@ user = "DEFAULT_USER"
 token = "DEFAULT_TOKEN"
 station = "DEFAULT_ID"
 
+def get_format_progs(progs):
+    ret = []
+    for prog in progs.keys():
+        ret.append({"program_name" : prog, "program_version" : progs[prog]})
+    return ret
+
+def add_raw_prog(progs, name, version):
+    if name in progs:
+        progs[name].append(version)
+    else:
+        progs[name] = [version]
+
 def send_data(prog_list):
-    data = json.dumps({"programs_list" : prog_list, "poste" : station})
+    data = json.dumps({"programs_list" : get_format_progs(prog_list), "poste" : station})
     headers = {'Accept': 'application/json; indent=4', 'content-type': 'application/x-www-form-urlencoded'}
 
     r = requests.post(url_backend, data=data, auth=(user, token), headers=headers)
@@ -25,20 +37,17 @@ def send_data(prog_list):
         return False
     return True
 
-def get_pacman_progs():
+def get_pacman_progs(progs):
     try:
         p = subprocess.check_output(['pacman', '-Q'])
     except FileNotFoundError:
         return []
     output = p.decode().split('\n')
 
-    progs = []
     for l in filter(None, output):
-        progs.append({"program_name" : l.split(' ')[0], "program_version" : l.split(' ')[1].split('-')[0]})
+        add_raw_prog(progs, l.split(' ')[0], l.split(' ')[1].split('-')[0])
 
-    return progs
-
-def get_pkg_progs():
+def get_pkg_progs(progs):
     try:
         p = subprocess.check_output(['pkg', 'info'])
     except FileNotFoundError:
@@ -46,13 +55,10 @@ def get_pkg_progs():
 
     output = [prog.split(' ')[0].split('_')[0] for prog in p.decode().split('\n')]
 
-    progs = []
     for prog in filter(None, output):
-        progs.append({"program_name" : ''.join(prog.split('-')[:-1]), "program_version" : prog.split('-')[-1]})
+        add_raw_prog(progs, ''.join(prog.split('-')[:-1]), prog.split('-')[-1])
 
-    return progs
-
-def get_dpkg_progs():
+def get_dpkg_progs(progs):
     try:
         p = subprocess.check_output(['dpkg', '-l'])
     except FileNotFoundError:
@@ -66,14 +72,11 @@ def get_dpkg_progs():
     while not output[0].endswith("==="):
         output.pop(0)
 
-    progs = []
     for l in filter(None, output[1:]):
         prog = list(filter(None, l.split(' ')))
-        progs.append({"program_name" : prog[1], "program_version" : prog[2]})
-        
-    return progs
+        add_raw_prog(progs, prog[1], prog[2].split('-')[0])
 
-def get_rpm_progs():
+def get_rpm_progs(progs):
     try:
         p = subprocess.check_output(['rpm', '-qia'])
     except (FileNotFoundError, subprocess.CalledProcessError):
@@ -81,13 +84,10 @@ def get_rpm_progs():
 
     output = [':'.join(prog.split('\n')[:3]).split(':')[1::2] for prog in p.decode().split('Name')]
 
-    progs = []
     for prog in output[1:]:
-        progs.append({"program_name" : prog[0], "program_version" : '-'.join([p.strip() for p in prog[1:-1]])})
+        add_raw_prog(progs, prog[0], '-'.join([p.strip() for p in prog[1:-1]]))
 
-    return progs
-
-def get_mac_progs():
+def get_mac_progs(progs):
     try:
         p = subprocess.check_output(['system_profiler', 'SPApplicationsDataType'])
     except FileNotFoundError:
@@ -96,15 +96,10 @@ def get_mac_progs():
     output = p.decode().split('\n\n    ')[1:]
     output = [output[off*2:off*2+2] for off in range(int(len(output) / 2))]
 
-    progs = []
     for prog in filter(lambda x: "Version:" in x[1], output):
-        progs.append({"program_name" : prog[0][:-1], "program_version" : prog[1].split('Version:')[1].split('\n')[0].strip()})
+        add_raw_prog(progs, prog[0][:-1], prog[1].split('Version:')[1].split('\n')[0].strip())
 
-    return progs
-
-def get_windows_progs():
-    progs = []
-
+def get_windows_progs(progs):
     for prog in wmi.WMI().Win32_Product():
         prog = str(prog).split("\n")
         progs.append({"program_name" : prog[12].split('"')[-2], "program_version" : prog[-4].split('"')[-2]})
@@ -113,7 +108,7 @@ def get_windows_progs():
     key = winreg.OpenKey(r, "Software\microsoft\Windows\CurrentVersion\\Uninstall")
     (nb_subKey, useless, useless) = winreg.QueryInfoKey(key)
 
-    already = [p["program_name"] for p in progs]
+    already = list(progs.keys())
 
     for idx in range(nb_subKey):
         key_name = winreg.EnumKey(key, idx)
@@ -124,14 +119,14 @@ def get_windows_progs():
         except FileNotFoundError:
             continue
         if prog_name not in already:
-            progs.append({"program_name" : prog_name, "program_version" : version})
+            add_raw_prog(progs, prog_name, version)
         winreg.CloseKey(sub_key)
     winreg.CloseKey(key)
 
     key = winreg.OpenKey(r, "Software\Wow6432Node\microsoft\Windows\CurrentVersion\\Uninstall")
     (nb_subKey, useless, useless) = winreg.QueryInfoKey(key)
 
-    already = [p["program_name"] for p in progs]
+    already = list(progs.keys())
 
     for idx in range(nb_subKey):
         key_name = winreg.EnumKey(key, idx)
@@ -142,7 +137,7 @@ def get_windows_progs():
         except FileNotFoundError:
             continue
         if prog_name not in already:
-            progs.append({"program_name" : prog_name, "program_version" : version})
+            add_raw_prog(progs, prog_name, version)
         winreg.CloseKey(sub_key)
     winreg.CloseKey(key)
 
@@ -152,22 +147,20 @@ def get_windows_progs():
 
     r.Close()
 
-    return progs
-
 def main():
-    progs = []
+    progs = {}
 
 
     if platform.system() == "Linux":
-        progs += get_pacman_progs()
-        progs += get_dpkg_progs()
-        progs += get_rpm_progs()
+        get_pacman_progs(progs)
+        get_dpkg_progs(progs)
+        get_rpm_progs(progs)
     elif "bsd" in platform.system().lower():
-        progs += get_pkg_progs()
+        get_pkg_progs(progs)
     elif "darwin" in platform.system().lower():
-        progs += get_mac_progs()
+        get_mac_progs(progs)
     elif "windows" in platform.system().lower():
-        progs += get_windows_progs()
+        get_windows_progs(progs)
 
     print(send_data(progs))
 
