@@ -23,7 +23,8 @@ def get_format_progs(progs):
 
 def add_raw_prog(progs, name, version):
     if name in progs:
-        progs[name].append(version)
+        if not version in progs[name]:
+            progs[name].append(version)
     else:
         progs[name] = [version]
 
@@ -101,8 +102,7 @@ def get_mac_progs(progs):
 
 def get_windows_progs(progs):
     for prog in wmi.WMI().Win32_Product():
-        prog = str(prog).split("\n")
-        progs.append({"program_name" : prog[12].split('"')[-2], "program_version" : prog[-4].split('"')[-2]})
+        add_raw_prog(progs, prog.wmi_property("Name").value, prog.wmi_property("Version").value)
 
     r = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
     key = winreg.OpenKey(r, "Software\microsoft\Windows\CurrentVersion\\Uninstall")
@@ -143,7 +143,7 @@ def get_windows_progs(progs):
 
     key = winreg.OpenKey(r, "Software\Microsoft\Internet Explorer");
     if key:
-        progs.append({"program_name" : "Internet Explorer", "program_version" : winreg.QueryValueEx(key, "Version")[0]})
+        add_raw_prog(progs, "Internet Explorer", winreg.QueryValueEx(key, "Version")[0])
 
     r.Close()
 
